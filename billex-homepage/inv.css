@@ -22,7 +22,8 @@
 .inv-input {
   display: inline-flex;
   align-items: center;
-  min-width: 150px;
+  width: 150px;        /* fixed: the box must not grow as digits are typed */
+  flex: none;
   height: 34px;
   padding: 0 11px;
   border: 1px solid #cbd5e4;
@@ -114,6 +115,3 @@
 .inv.no-motion, .inv.no-motion *,
 .inv.no-motion *::before, .inv.no-motion *::after { transition: none !important; }
 
-@media (width <= 560px) {
-  .inv-input { min-width: 0; }
-}

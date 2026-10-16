@@ -10,6 +10,10 @@
   var map = card.querySelector('.route-map');
   var stops = card.querySelectorAll('.route-stops li');
   var rows = Array.prototype.slice.call(card.querySelectorAll('.shot-row[data-at]'));
+  var stopTimes = card.querySelectorAll('.route-stops small');
+  var received = card.querySelector('[data-received]');
+  var stampDate = card.querySelector('[data-stamp] span');
+  var D = window.BillexDates;
 
   var TRAVEL = 900;      // ms per leg, matches --travel in route.css
   var HOLD = 3000;       // stamped receipt stays up this long
@@ -31,6 +35,19 @@
 
   function setP(p) { map.style.setProperty('--p', p); }
 
+  // The journey happens "now": delivered at about the moment the envelope
+  // reaches the inbox in this round (~4 s in), through the postman 13 s
+  // before that and sent 20 s before. Shown times are never in the future.
+  var LEGS = [-20, -13, 0];
+  var ARRIVE = 4000;     // ms from round start to the envelope's arrival
+  function setTimes() {
+    var arrive = Date.now() + ARRIVE;
+    var at = LEGS.map(function (s) { return new Date(arrive + s * 1000); });
+    stopTimes.forEach(function (el, i) { el.textContent = D.hms(at[i]); });
+    received.textContent = D.dots(at[2]) + ' ' + D.hms(at[2]);
+    stampDate.textContent = D.spaced(at[2]) + ' · ' + D.hm(at[2]);
+  }
+
   // Back to the empty receipt in one frame, without transitions
   function reset() {
     card.classList.add('no-motion');
@@ -38,6 +55,7 @@
     stops.forEach(function (s) { s.classList.remove('is-on'); });
     rows.forEach(function (r) { r.classList.remove('is-check', 'is-in'); r.classList.add('is-wait'); });
     setP(0);
+    setTimes();
     void card.offsetHeight;
     card.classList.remove('no-motion');
   }
@@ -118,6 +136,7 @@
     run++;
   }
 
+  setTimes();
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!('IntersectionObserver' in window)) { start(); return; }
 

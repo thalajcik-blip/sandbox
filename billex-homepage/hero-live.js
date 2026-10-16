@@ -1,8 +1,9 @@
 /* Hero — live inbox feed. See hero-live.css.
    POOL[0..4] are the five rows already in the markup; the feed continues
    from POOL[5] and wraps. With 12 invoices and at most 6 rows in the DOM,
-   the same invoice is never on screen twice. The loop only runs while the
-   box is on screen. */
+   the same invoice is never on screen twice. Due dates and years in
+   `meta` are dates.js tokens, so they are always relative to today. The
+   loop only runs while the box is on screen. */
 (function () {
   var card = document.querySelector('[data-inbox]');
   if (!card) return;
@@ -16,22 +17,28 @@
 
   var OK = { dot: 'ok', badge: 'g', text: 'V poriadku' };
   var POOL = [
-    { who: 'Palivá Východ, a.s.', meta: '2026/004512 · splatnosť 21. 9.', amt: '1 344,24 €', v: { dot: 'hi', badge: 'w', text: 'Zmena účtu' } },
-    { who: 'Stavebniny Juh s.r.o.', meta: 'FA26-0881 · splatnosť 31. 8.', amt: '4 902,00 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
-    { who: 'Telekom Plus, a.s.', meta: '9261140088 · splatnosť 24. 9.', amt: '96,48 €', v: OK },
-    { who: 'Kancelárske potreby s.r.o.', meta: '260900117 · splatnosť 30. 9.', amt: '213,90 €', v: OK },
-    { who: 'Pekáreň Lipa s.r.o.', meta: '2026/0219 · splatnosť 2. 10.', amt: '58,30 €', v: OK },
-    { who: 'Energia Stred, a.s.', meta: '7300912284 · splatnosť 5. 10.', amt: '412,75 €', v: OK },
-    { who: 'Stavby Orava s.r.o.', meta: 'FA-2026-118 · splatnosť 9. 10.', amt: '2 760,00 €', v: { dot: 'hi', badge: 'w', text: 'Účet mimo FS' } },
-    { who: 'Autoservis Kováč', meta: '26-0412 · splatnosť 10. 10.', amt: '389,00 €', v: OK },
-    { who: 'IT Služby Tatry s.r.o.', meta: '2026100 · splatnosť 12. 10.', amt: '1 180,00 €', v: OK },
-    { who: 'Logistika Dunaj s.r.o.', meta: 'LD26-3307 · splatnosť 14. 10.', amt: '1 905,60 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
-    { who: 'Čistiareň Biela', meta: '0921/26 · splatnosť 15. 10.', amt: '74,20 €', v: OK },
-    { who: 'Tlačiareň Prešov s.r.o.', meta: 'TP-26-551 · splatnosť 16. 10.', amt: '640,00 €', v: OK }
+    { who: 'Palivá Východ, a.s.', meta: '{YYYY}/004512 · splatnosť {+14}', amt: '1 344,24 €', v: { dot: 'hi', badge: 'w', text: 'Zmena účtu' } },
+    { who: 'Stavebniny Juh s.r.o.', meta: 'FA{YY}-0881 · splatnosť {+10}', amt: '4 902,00 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
+    { who: 'Telekom Plus, a.s.', meta: '9261140088 · splatnosť {+17}', amt: '96,48 €', v: OK },
+    { who: 'Kancelárske potreby s.r.o.', meta: '{YY}0900117 · splatnosť {+21}', amt: '213,90 €', v: OK },
+    { who: 'Pekáreň Lipa s.r.o.', meta: '{YYYY}/0219 · splatnosť {+7}', amt: '58,30 €', v: OK },
+    { who: 'Energia Stred, a.s.', meta: '7300912284 · splatnosť {+15}', amt: '412,75 €', v: OK },
+    { who: 'Stavby Orava s.r.o.', meta: 'FA-{YYYY}-118 · splatnosť {+30}', amt: '2 760,00 €', v: { dot: 'hi', badge: 'w', text: 'Účet mimo FS' } },
+    { who: 'Autoservis Kováč', meta: '{YY}-0412 · splatnosť {+14}', amt: '389,00 €', v: OK },
+    { who: 'IT Služby Tatry s.r.o.', meta: '{YYYY}100 · splatnosť {+21}', amt: '1 180,00 €', v: OK },
+    { who: 'Logistika Dunaj s.r.o.', meta: 'LD{YY}-3307 · splatnosť {+12}', amt: '1 905,60 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
+    { who: 'Čistiareň Biela', meta: '0921/{YY} · splatnosť {+7}', amt: '74,20 €', v: OK },
+    { who: 'Tlačiareň Prešov s.r.o.', meta: 'TP-{YY}-551 · splatnosť {+14}', amt: '640,00 €', v: OK }
   ];
 
   var next = ROWS;
   var timer = null;
+  var fill = window.BillexDates.fill;
+
+  // the rows already in the markup get today's dates too
+  Array.prototype.forEach.call(list.children, function (li, i) {
+    li.querySelector('.who small').textContent = fill(POOL[i].meta);
+  });
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -44,7 +51,7 @@
     var li = el('li', 'shot-row inbox-row is-entering is-checking');
     li.appendChild(el('span', 'dot ' + item.v.dot));
     var who = el('span', 'who', item.who);
-    who.appendChild(el('small', '', item.meta));
+    who.appendChild(el('small', '', fill(item.meta)));
     li.appendChild(who);
     var pill = el('span', 'badge c');
     pill.appendChild(el('i'));

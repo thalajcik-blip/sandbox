@@ -358,7 +358,7 @@ html { scroll-padding-top: 76px; }
           </ul>
         </div>
         <div class="shot inv" aria-label="Náhľad editora faktúry" data-inv>
-          <div class="bar"><i></i><i></i><i></i><span>Faktúra 2026/000412</span></div>
+          <div class="bar"><i></i><i></i><i></i><span data-fill="Faktúra {YYYY}/000412">Faktúra 2026/000412</span></div>
           <div class="body">
             <!-- inv.js replays this invoice in an endless loop -->
             <span class="inv-intro-label" aria-hidden="true">Zadajte IČO odberateľa</span>
@@ -451,7 +451,7 @@ html { scroll-padding-top: 76px; }
             <div class="shot-row" data-at="1" data-check="650"><span class="who">Norma EN 16931</span><span class="badge g">V poriadku</span></div>
             <div class="shot-row" data-at="1" data-check="500"><span class="who">Účet v zozname Finančnej správy</span><span class="badge g">Áno</span></div>
             <div class="shot-row" data-at="1" data-check="250"><span class="who">Odtlačok originálu</span><span class="amt">sha256 a41f…c7e2</span></div>
-            <div class="shot-row" data-at="2"><span class="who">Prevzaté</span><span class="amt">07.09.2026 08:14:22</span></div>
+            <div class="shot-row" data-at="2"><span class="who">Prevzaté</span><span class="amt" data-received>07.09.2026 08:14:22</span></div>
             <div class="stamp" data-stamp><b>Doručené</b><span class="num">07. 09. 2026 · 08:14</span></div>
           </div>
           <p class="shot-cap" style="padding:0 18px 16px">Doručenka zostáva v archíve aj vtedy, keď
@@ -729,6 +729,7 @@ html { scroll-padding-top: 76px; }
 })();
 
 </script>
+<script src="dates.js" defer></script>
 <script src="hero-live.js" defer></script>
 <script src="route.js" defer></script>
 <script src="inv.js" defer></script>

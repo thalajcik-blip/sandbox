@@ -237,63 +237,31 @@ html { scroll-padding-top: 76px; }
 
       <div class="shot inbox" aria-label="Náhľad doručenej pošty" data-inbox>
         <div class="bar"><i></i><i></i><i></i><span>Doručená pošta</span>
-          <b class="inbox-count" data-count>4 nové</b></div>
+          <b class="inbox-live"><i></i>naživo</b></div>
         <div class="body">
-          <div class="inbox-live" data-live>
-            <p class="inbox-empty" data-empty>
-              <svg width="22" height="22" aria-hidden="true"><use href="#i-mail"></use></svg>
-              Schránka je pripravená. Čakáme na faktúry…</p>
-            <div class="inbox-list" data-list>
-              <div class="inbox-item" data-check="1400">
-                <button class="shot-row" type="button" aria-expanded="true" aria-controls="inbox-d1">
-                  <span class="dot hi"></span>
-                  <span class="who">Palivá Východ, a.s.<small>2026/004512 · splatnosť 21. 9.</small></span>
-                  <span class="badge w">Zmena účtu</span>
-                  <span class="amt">1 344,24 €</span>
-                  <svg class="chev" width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
-                </button>
-                <div class="inbox-detail" id="inbox-d1"><div class="inbox-detail-in">
-                  <dl class="iban">
-                    <div><dt>Doteraz, 11 faktúr</dt><dd>SK31 1100 … 4417</dd></div>
-                    <div><dt>Na tejto faktúre</dt><dd class="new">SK89 7500 … 0912</dd></div>
-                  </dl>
-                  <p>Nový účet nie je v zozname Finančnej správy. Zmenu si overte na čísle, ktoré
-                    od dodávateľa už poznáte — nie na tom z faktúry.</p>
-                </div></div>
-              </div>
-              <div class="inbox-item" data-check="1200">
-                <button class="shot-row" type="button" aria-expanded="false" aria-controls="inbox-d2">
-                  <span class="dot mid"></span>
-                  <span class="who">Stavebniny Juh s.r.o.<small>FA26-0881 · splatnosť 31. 8.</small></span>
-                  <span class="badge w">Duplicita</span>
-                  <span class="amt">4 902,00 €</span>
-                  <svg class="chev" width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
-                </button>
-                <div class="inbox-detail" id="inbox-d2"><div class="inbox-detail-in">
-                  <p>Rovnaké číslo, suma aj dodávateľ ako faktúra prijatá 14. 8. Prišla dvakrát —
-                    zaplatiť ju druhýkrát netreba.</p>
-                </div></div>
-              </div>
-              <div class="inbox-item" data-check="700">
-                <div class="shot-row"><span class="dot ok"></span>
-                  <span class="who">Telekom Plus, a.s.<small>9261140088 · splatnosť 24. 9.</small></span>
-                  <span class="badge g">V poriadku</span>
-                  <span class="amt">96,48 €</span></div>
-              </div>
-              <div class="inbox-item" data-check="700">
-                <div class="shot-row"><span class="dot ok"></span>
-                  <span class="who">Kancelárske potreby s.r.o.<small>260900117 · splatnosť 30. 9.</small></span>
-                  <span class="badge g">V poriadku</span>
-                  <span class="amt">213,90 €</span></div>
-              </div>
-            </div>
-            <div class="inbox-foot" data-foot>
-              <span>Skontrolované 4 z 4 · <b>2 si pred platbou overte</b></span>
-              <button class="inbox-replay" type="button" data-replay hidden>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-                Znova</button>
-            </div>
-          </div>
+          <!-- hero-live.js keeps this list running as an endless feed -->
+          <ul class="inbox-list" data-list>
+            <li class="shot-row inbox-row"><span class="dot hi"></span>
+              <span class="who">Palivá Východ, a.s.<small>2026/004512 · splatnosť 21. 9.</small></span>
+              <span class="badge w">Zmena účtu</span>
+              <span class="amt">1 344,24 €</span></li>
+            <li class="shot-row inbox-row"><span class="dot mid"></span>
+              <span class="who">Stavebniny Juh s.r.o.<small>FA26-0881 · splatnosť 31. 8.</small></span>
+              <span class="badge w">Duplicita</span>
+              <span class="amt">4 902,00 €</span></li>
+            <li class="shot-row inbox-row"><span class="dot ok"></span>
+              <span class="who">Telekom Plus, a.s.<small>9261140088 · splatnosť 24. 9.</small></span>
+              <span class="badge g">V poriadku</span>
+              <span class="amt">96,48 €</span></li>
+            <li class="shot-row inbox-row"><span class="dot ok"></span>
+              <span class="who">Kancelárske potreby s.r.o.<small>260900117 · splatnosť 30. 9.</small></span>
+              <span class="badge g">V poriadku</span>
+              <span class="amt">213,90 €</span></li>
+            <li class="shot-row inbox-row"><span class="dot ok"></span>
+              <span class="who">Pekáreň Lipa s.r.o.<small>2026/0219 · splatnosť 2. 10.</small></span>
+              <span class="badge g">V poriadku</span>
+              <span class="amt">58,30 €</span></li>
+          </ul>
         </div>
       </div>
     </div>

@@ -1,171 +1,104 @@
-/* Hero — live inbox. See hero-live.css for the idea.
-   Arrival order is the reverse of the markup order: rows are prepended, so
-   the last one in the markup arrives first and the most important warning
-   lands on top, last. Arrivals overlap; each row runs its own check. */
+/* Hero — live inbox feed. See hero-live.css.
+   POOL[0..4] are the five rows already in the markup; the feed continues
+   from POOL[5] and wraps. With 12 invoices and at most 6 rows in the DOM,
+   the same invoice is never on screen twice. The loop only runs while the
+   box is on screen. */
 (function () {
   var card = document.querySelector('[data-inbox]');
   if (!card) return;
-
-  var live = card.querySelector('[data-live]');
   var list = card.querySelector('[data-list]');
-  var count = card.querySelector('[data-count]');
-  var foot = card.querySelector('[data-foot]');
-  var replay = card.querySelector('[data-replay]');
-  var items = Array.prototype.slice.call(list.children);
-  var toggles = list.querySelectorAll('button.shot-row');
 
-  var START_DELAY = 400;  // ms after the card comes into view
-  var STAGGER = 700;      // ms between two arrivals
-  var ENTER = 380;        // ms, matches the grid-template-rows transition
-  var OPEN_AFTER = 600;   // ms after the last verdict before the top warning opens
+  var ROWS = 5;
+  var EVERY = 2600;      // ms between arrivals
+  var ENTER = 500;       // ms, matches the height transition
+  var CHECK_OK = 900;    // ms of "Kontrolujem" before a clean verdict
+  var CHECK_WARN = 1400; // a little longer when something is found
 
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var run = 0;            // bumping this cancels a sequence in flight
-  var userTouched = false;
+  var OK = { dot: 'ok', badge: 'g', text: 'V poriadku' };
+  var POOL = [
+    { who: 'Palivá Východ, a.s.', meta: '2026/004512 · splatnosť 21. 9.', amt: '1 344,24 €', v: { dot: 'hi', badge: 'w', text: 'Zmena účtu' } },
+    { who: 'Stavebniny Juh s.r.o.', meta: 'FA26-0881 · splatnosť 31. 8.', amt: '4 902,00 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
+    { who: 'Telekom Plus, a.s.', meta: '9261140088 · splatnosť 24. 9.', amt: '96,48 €', v: OK },
+    { who: 'Kancelárske potreby s.r.o.', meta: '260900117 · splatnosť 30. 9.', amt: '213,90 €', v: OK },
+    { who: 'Pekáreň Lipa s.r.o.', meta: '2026/0219 · splatnosť 2. 10.', amt: '58,30 €', v: OK },
+    { who: 'Energia Stred, a.s.', meta: '7300912284 · splatnosť 5. 10.', amt: '412,75 €', v: OK },
+    { who: 'Stavby Orava s.r.o.', meta: 'FA-2026-118 · splatnosť 9. 10.', amt: '2 760,00 €', v: { dot: 'hi', badge: 'w', text: 'Účet mimo FS' } },
+    { who: 'Autoservis Kováč', meta: '26-0412 · splatnosť 10. 10.', amt: '389,00 €', v: OK },
+    { who: 'IT Služby Tatry s.r.o.', meta: '2026100 · splatnosť 12. 10.', amt: '1 180,00 €', v: OK },
+    { who: 'Logistika Dunaj s.r.o.', meta: 'LD26-3307 · splatnosť 14. 10.', amt: '1 905,60 €', v: { dot: 'mid', badge: 'w', text: 'Duplicita' } },
+    { who: 'Čistiareň Biela', meta: '0921/26 · splatnosť 15. 10.', amt: '74,20 €', v: OK },
+    { who: 'Tlačiareň Prešov s.r.o.', meta: 'TP-26-551 · splatnosť 16. 10.', amt: '640,00 €', v: OK }
+  ];
 
-  // Ghost: the final state, invisible, in the same grid cell as the live
-  // layer. It sizes the card, so arrivals and the opening detail never
-  // change the card's height.
-  var ghost = live.cloneNode(true);
-  ghost.classList.add('inbox-ghost');
-  ghost.removeAttribute('data-live');
-  ghost.setAttribute('aria-hidden', 'true');
-  ghost.setAttribute('inert', '');
-  ghost.querySelectorAll('[data-replay]').forEach(function (el) { el.hidden = false; });
-  // no ids or data hooks, so nothing (including later lookups) can hit the copy
-  ghost.querySelectorAll('[id], [data-list], [data-empty], [data-foot], [data-replay]').forEach(function (el) {
-    ['id', 'data-list', 'data-empty', 'data-foot', 'data-replay'].forEach(function (a) { el.removeAttribute(a); });
+  var next = ROWS;
+  var timer = null;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  function makeRow(item) {
+    var li = el('li', 'shot-row inbox-row is-entering is-checking');
+    li.appendChild(el('span', 'dot ' + item.v.dot));
+    var who = el('span', 'who', item.who);
+    who.appendChild(el('small', '', item.meta));
+    li.appendChild(who);
+    var pill = el('span', 'badge c');
+    pill.appendChild(el('i'));
+    pill.appendChild(document.createTextNode('Kontrolujem'));
+    li.appendChild(pill);
+    li.appendChild(el('span', 'badge ' + item.v.badge, item.v.text));
+    li.appendChild(el('span', 'amt', item.amt));
+    return li;
+  }
+
+  function arrive() {
+    var item = POOL[next % POOL.length];
+    next++;
+    var li = makeRow(item);
+    list.insertBefore(li, list.firstChild);
+    void li.offsetHeight;
+    li.classList.remove('is-entering');
+
+    // the row pushed past the last slot is now outside the box
+    setTimeout(function () {
+      while (list.children.length > ROWS) list.lastElementChild.remove();
+    }, ENTER + 50);
+
+    setTimeout(function () {
+      li.classList.remove('is-checking');
+      li.classList.add('is-resolved');
+    }, ENTER + (item.v === OK ? CHECK_OK : CHECK_WARN));
+  }
+
+  // One timeout chain, so arrivals stay exactly EVERY apart even when the
+  // loop is paused and resumed; the first comes soon after the box shows up.
+  function tick() {
+    arrive();
+    timer = setTimeout(tick, EVERY);
+  }
+  function start() {
+    if (timer) return;
+    timer = setTimeout(tick, 600);
+  }
+  function stop() {
+    clearTimeout(timer);
+    timer = null;
+  }
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) { start(); return; }
+
+  var visible = false;
+  new IntersectionObserver(function (entries) {
+    visible = entries[entries.length - 1].isIntersecting;
+    visible && !document.hidden ? start() : stop();
+  }, { threshold: 0.2 }).observe(card);
+
+  document.addEventListener('visibilitychange', function () {
+    visible && !document.hidden ? start() : stop();
   });
-  live.parentNode.insertBefore(ghost, live);
-
-  // "Kontrolujem" pill for each row
-  items.forEach(function (item) {
-    var pill = document.createElement('span');
-    pill.className = 'badge c';
-    pill.innerHTML = '<i></i>Kontrolujem';
-    var verdict = item.querySelector('.badge');
-    verdict.parentNode.insertBefore(pill, verdict);
-  });
-
-  // Accordion: one explanation open at a time
-  toggles.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      userTouched = true;
-      var open = btn.getAttribute('aria-expanded') === 'true';
-      toggles.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
-      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-    });
-  });
-
-  function wait(ms, id) {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () { id === run ? resolve() : reject(); }, ms);
-    });
-  }
-
-  function plural(n) {
-    return n === 1 ? '1 nová' : n < 5 ? n + ' nové' : n + ' nových';
-  }
-
-  function setCount(n) {
-    count.textContent = plural(n);
-    count.classList.toggle('is-zero', n === 0);
-    if (n > 0) {
-      count.classList.remove('bump');
-      void count.offsetWidth;
-      count.classList.add('bump');
-    }
-  }
-
-  function reset() {
-    items.forEach(function (item) {
-      item.remove();
-      item.classList.remove('is-checking', 'is-resolved', 'is-entering', 'clip');
-    });
-    toggles.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); b.disabled = true; });
-    card.classList.add('is-empty');
-    foot.classList.add('is-pending');
-    replay.hidden = true;
-    setCount(0);
-    userTouched = false;
-  }
-
-  function showFinal() {
-    items.forEach(function (item) {
-      item.classList.remove('is-checking', 'is-entering', 'clip');
-      list.appendChild(item);
-    });
-    toggles.forEach(function (b, i) { b.disabled = false; b.setAttribute('aria-expanded', i === 0 ? 'true' : 'false'); });
-    card.classList.remove('is-empty');
-    foot.classList.remove('is-pending');
-    count.textContent = plural(items.length);
-    count.classList.remove('is-zero');
-  }
-
-  function arrive(item, id) {
-    item.classList.add('is-entering', 'clip', 'is-checking');
-    list.insertBefore(item, list.firstChild);
-    card.classList.remove('is-empty');
-    void item.offsetHeight;
-    item.classList.remove('is-entering');
-    setCount(list.children.length);
-
-    return wait(ENTER, id).then(function () {
-      item.classList.remove('clip');
-      return wait(+item.getAttribute('data-check') || 800, id);
-    }).then(function () {
-      item.classList.remove('is-checking');
-      item.classList.add('is-resolved');
-      var btn = item.querySelector('button.shot-row');
-      if (btn) btn.disabled = false;
-    });
-  }
-
-  function play() {
-    var id = ++run;
-    reset();
-    var order = items.slice().reverse();
-
-    wait(START_DELAY, id).then(function () {
-      var checks = order.map(function (item, i) {
-        return wait(i * STAGGER, id).then(function () { return arrive(item, id); });
-      });
-      return Promise.all(checks);
-    }).then(function () {
-      return wait(OPEN_AFTER, id);
-    }).then(function () {
-      if (!userTouched) toggles[0].setAttribute('aria-expanded', 'true');
-      return wait(250, id);
-    }).then(function () {
-      foot.classList.remove('is-pending');
-      replay.hidden = false;
-    }).catch(function () { /* cancelled by a newer run */ });
-  }
-
-  replay.addEventListener('click', function () {
-    play();
-    // keep keyboard focus somewhere sensible while the button is hidden
-    card.setAttribute('tabindex', '-1');
-    card.focus({ preventScroll: true });
-  });
-
-  if (reduced.matches || !('IntersectionObserver' in window)) {
-    showFinal();
-    return;
-  }
-
-  // Empty the card right away so the final state never flashes, then
-  // start once it is actually on screen (below the fold on phones).
-  card.classList.add('no-motion');
-  reset();
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () { card.classList.remove('no-motion'); });
-  });
-  var io = new IntersectionObserver(function (entries) {
-    if (entries.some(function (e) { return e.isIntersecting; })) {
-      io.disconnect();
-      play();
-    }
-  }, { threshold: 0.3 });
-  io.observe(card);
 })();

@@ -3,9 +3,11 @@
    lines and counts up the total, holds the finished invoice for a moment,
    fades out and starts over. No interaction. Pending rows keep their
    space (opacity only), so the card never changes size. The markup is the
-   finished invoice, which is also the no-JS / reduced-motion state. */
+   finished invoice, which is also the no-JS / reduced-motion state.
+   .is-intro: the IČO input is enlarged in the middle of the card (inv.js
+   sets the transform from measured positions) under its own caption. */
 
-.inv .body { transition: opacity .35s ease; }
+.inv .body { position: relative; transition: opacity .35s ease; }
 .inv.is-fading .body { opacity: 0; }
 
 .inv-field {
@@ -30,8 +32,28 @@
   font-size: 14px;
   font-weight: 700;
   letter-spacing: .03em;
-  transition: border-color .2s, box-shadow .2s;
+  transform-origin: center;
+  transition: border-color .2s, box-shadow .2s, transform .65s cubic-bezier(.2, .7, .2, 1);
 }
+.inv-field { transition: border-color .4s ease; }
+.inv-label { transition: opacity .4s ease; }
+.inv.is-intro .inv-field { border-bottom-color: transparent; }
+.inv.is-intro .inv-label { opacity: 0; }
+.inv-intro-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  translate: 0 -100%;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.inv.is-intro .inv-intro-label { opacity: 1; }
+
 .inv-caret { width: 1.5px; height: 16px; margin-left: 1px; background: var(--blue); opacity: 0; }
 .inv.is-typing .inv-input { border-color: var(--blue); box-shadow: 0 0 0 3px #2563eb22; }
 .inv.is-typing .inv-caret { opacity: 1; animation: inv-blink 1s steps(1) infinite; }

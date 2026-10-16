@@ -1,10 +1,16 @@
 /* Fakturácia — self-filling invoice, endless loop. See inv.css.
-   The loop only runs while the card is on screen and the tab is visible;
+   Each round opens on a large IČO field centred in the card; once the
+   number is typed, the field glides up and shrinks into its place in the
+   invoice (a FLIP: the field stays in its final spot in the layout and is
+   only transformed, so nothing below it moves). The loop only runs while the card is on screen and the tab is visible;
    when it pauses mid-way it restarts from an empty invoice. */
 (function () {
   var card = document.querySelector('[data-inv]');
   if (!card) return;
 
+  var body = card.querySelector('.body');
+  var input = card.querySelector('.inv-input');
+  var caption = card.querySelector('.inv-intro-label');
   var ico = card.querySelector('[data-inv-ico]');
   var company = card.querySelector('[data-inv-step="company"]');
   var lines = Array.prototype.slice.call(card.querySelectorAll('[data-inv-step="line"]'));
@@ -13,7 +19,8 @@
 
   var ICO = ico.textContent;
   var TOTAL = +total.getAttribute('data-inv-total');
-  var TYPE_MS = 75;      // per digit
+  var TYPE_MS = 85;      // per digit
+  var SETTLE_MS = 650;   // matches the .inv-input transform transition
   var SEARCH_MS = 700;   // register lookup
   var LINE_MS = 230;     // between invoice lines
   var COUNT_MS = 650;    // total count-up
@@ -30,8 +37,24 @@
     });
   }
 
+  // Transform that takes the input from its place in the invoice to the
+  // middle of the card at intro size; the caption sits just above it.
+  function placeIntro() {
+    input.style.transform = '';
+    var b = body.getBoundingClientRect();
+    var r = input.getBoundingClientRect();
+    var scale = window.innerWidth <= 560 ? 1.4 : 1.7;
+    var cy = b.height / 2 + 16;                      // input centre, from body top
+    var dx = (b.left + b.width / 2) - (r.left + r.width / 2);
+    var dy = (b.top + cy) - (r.top + r.height / 2);
+    input.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ')';
+    caption.style.top = (cy - r.height * scale / 2 - 14) + 'px';
+  }
+
   function reset() {
     card.classList.add('no-motion');
+    card.classList.add('is-intro');
+    placeIntro();
     card.classList.remove('is-typing');
     ico.textContent = '';
     company.classList.remove('is-search');
@@ -68,9 +91,13 @@
       });
     });
     return chain.then(function () {
-      return wait(220, id);
+      return wait(350, id);
     }).then(function () {
-      card.classList.remove('is-typing');
+      // glide into place
+      card.classList.remove('is-typing', 'is-intro');
+      input.style.transform = '';
+      return wait(SETTLE_MS + 100, id);
+    }).then(function () {
       company.classList.remove('is-pending');
       company.classList.add('is-search');
       return wait(SEARCH_MS, id);

@@ -1,0 +1,228 @@
+/* Hero — live inbox.
+   Invoices arrive one by one (newest on top), each is checked, and the
+   first warning opens to show what Billex found. The markup is the final
+   state, so without JS (or with reduced motion) the card is complete.
+   hero-live.js replays the arrival and keeps a hidden "ghost" copy of the
+   final state in the same grid cell, which reserves the card's height so
+   the hero never jumps while rows come in. */
+
+.hero-grid { grid-template-columns: minmax(0, 1fr) 420px; }  /* was 390px: room for the chevron */
+@media (width <= 900px) { .hero-grid { grid-template-columns: 1fr; } }
+.inbox .bar { padding-right: 12px; }
+.inbox-count {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--blue-100);
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  transition: opacity .2s;
+}
+.inbox-count.is-zero { opacity: 0; }
+.inbox-count.bump { animation: inbox-bump .32s cubic-bezier(.2, .7, .3, 1.4); }
+
+.inbox .body { display: grid; }
+.inbox .body > * { grid-area: 1 / 1; min-width: 0; }
+.inbox-ghost, .inbox-ghost * { visibility: hidden !important; }
+
+.inbox-live { display: flex; flex-direction: column; position: relative; }
+
+/* Empty state, shown before the first invoice arrives */
+.inbox-empty {
+  position: absolute;
+  inset: 0 0 44px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.inbox-empty svg { color: #9fb0d2; }
+.inbox.is-empty .inbox-empty { opacity: 1; }
+
+/* Rows */
+.inbox-item {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows .38s cubic-bezier(.2, .7, .3, 1), opacity .3s ease, translate .38s cubic-bezier(.2, .7, .3, 1);
+}
+.inbox-item > * { min-height: 0; }
+.inbox-item.clip { overflow: hidden; }
+.inbox-item.is-entering { grid-template-rows: 0fr; opacity: 0; translate: 0 -10px; }
+/* padding does not collapse with 0fr, so it animates alongside */
+.inbox-item.is-entering .shot-row { padding-block: 0; }
+.inbox-item + .inbox-item { border-top: 1px solid #eef1f7; }
+
+.inbox .shot-row {
+  width: calc(100% + 16px);
+  margin: 0 -8px;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 9px;
+  gap: 10px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+.inbox .shot-row { transition: padding .38s cubic-bezier(.2, .7, .3, 1), background-color .15s; }
+.inbox button.shot-row { cursor: pointer; }
+.inbox button.shot-row:hover:not(:disabled) { background: #f8faff; }
+.inbox button.shot-row:disabled { cursor: default; }
+
+.inbox .chev {
+  flex: none;
+  margin-left: -2px;
+  color: #94a0b4;
+  transition: transform .25s cubic-bezier(.2, .7, .3, 1), opacity .2s;
+}
+.inbox [aria-expanded="true"] .chev { transform: rotate(90deg); color: var(--warn-ink); }
+
+/* Checking state: grey pulsing dot, "Kontrolujem" pill instead of the verdict */
+.inbox-item.is-checking .shot-row .dot {
+  background: #cbd3e1;
+  border: 0;
+  animation: inbox-pulse 1s ease-in-out infinite;
+}
+.inbox-item.is-checking .shot-row .dot::after { display: none; }
+.inbox-item.is-checking .badge:not(.c) { display: none; }
+.inbox-item.is-checking .chev { opacity: 0; }
+.inbox-item:not(.is-checking) .badge.c { display: none; }
+.inbox .badge.c {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  background: #f4f6fa;
+  border: 1px solid var(--line);
+}
+.inbox .badge.c i {
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid #b6c1d4;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: inbox-spin .7s linear infinite;
+}
+
+/* Verdict lands */
+.inbox-item.is-resolved .badge:not(.c) { animation: inbox-pop .34s cubic-bezier(.2, .7, .3, 1.35); }
+.inbox-item.is-resolved .dot { animation: inbox-pop .34s cubic-bezier(.2, .7, .3, 1.6); }
+
+/* Expandable explanation under a warning row */
+.inbox-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows .32s cubic-bezier(.2, .7, .3, 1), visibility 0s .32s;
+}
+[aria-expanded="true"] + .inbox-detail {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.inbox-detail-in { min-height: 0; overflow: hidden; }
+.inbox-detail-in > :first-child { margin-top: 2px; }
+.inbox-detail-in > :last-child { margin-bottom: 12px; }
+.inbox-detail p {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--warn-line);
+  border-radius: 10px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.inbox-detail .iban + p { border-top: 0; border-radius: 0 0 10px 10px; }
+.iban {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--warn-line);
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+  overflow: hidden;
+}
+.iban div { padding: 8px 12px; }
+.iban div + div { border-left: 1px solid var(--warn-line); }
+.iban dt { color: var(--muted); font-size: 11px; }
+.iban dd {
+  margin: 1px 0 0;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.iban dd.new { color: #b91c1c; }
+
+/* Footer: summary + replay, pinned to the bottom of the reserved height */
+.inbox-foot {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eef1f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  transition: opacity .3s ease, translate .3s ease;
+}
+.inbox-foot b { color: var(--warn-ink); }
+.inbox-foot.is-pending { opacity: 0; translate: 0 4px; }
+.inbox-list { margin-bottom: 8px; }
+.inbox-replay {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--blue);
+  font: 700 12px Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.inbox-replay:hover { background: var(--blue-50); }
+.inbox-replay[hidden] { display: none; }
+
+/* first reset on page load must not animate away the server-rendered state */
+.inbox.no-motion, .inbox.no-motion * { transition: none !important; }
+
+@keyframes inbox-pulse { 50% { opacity: .45; } }
+@keyframes inbox-spin { to { transform: rotate(360deg); } }
+@keyframes inbox-pop { from { transform: scale(.7); opacity: .3; } }
+@keyframes inbox-bump { 40% { transform: scale(1.18); } }
+
+/* Phones: the verdict moves under the name, so names and dates stay on one line */
+@media (width <= 560px) {
+  .inbox .shot-row {
+    display: grid;
+    grid-template-columns: 9px minmax(0, 1fr) auto 14px;
+    grid-template-areas: "dot who amt chev" ". badge badge .";
+    gap: 6px 10px;
+  }
+  .inbox .shot-row .dot { grid-area: dot; align-self: start; margin-top: 5px; }
+  .inbox .shot-row .who { grid-area: who; }
+  .inbox .shot-row .badge { grid-area: badge; justify-self: start; }
+  .inbox .shot-row .amt { grid-area: amt; align-self: start; }
+  .inbox .shot-row .chev { grid-area: chev; align-self: start; margin: 2px 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inbox-item, .inbox-detail, .inbox-foot, .inbox .chev { transition: none; }
+  .inbox-item.is-resolved .badge:not(.c), .inbox-item.is-resolved .dot,
+  .inbox-count.bump { animation: none; }
+}

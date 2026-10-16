@@ -1,0 +1,214 @@
+/* Digitálny poštár — one invoice's journey on its delivery receipt.
+   An envelope travels supplier → Billex postman → your inbox along the
+   map at the top of the receipt. Each row of the receipt fills in at the
+   stop where that fact becomes known, and on arrival the receipt is
+   stamped. The markup ships as ".is-final" (complete without JS and with
+   reduced motion); route.js resets it and plays the journey. */
+
+.route .bar { padding-right: 12px; }
+.route-replay {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--blue);
+  font: 700 12px Inter, system-ui, sans-serif;
+  cursor: pointer;
+}
+.route-replay:hover { background: var(--blue-50); }
+.route-replay[hidden] { display: none; }
+
+/* ── Map ───────────────────────────────────────────────────────────────── */
+.route-map {
+  --travel: .9s;
+  --ease: cubic-bezier(.45, 0, .25, 1);
+  position: relative;
+  padding: 34px 18px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcff;
+}
+.route-line {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 38.5px;          /* centre of the 12px dots below */
+  height: 3px;
+  border-radius: 2px;
+  background: #e3e8f1;
+  overflow: hidden;
+}
+.route-fill {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+  transition: transform var(--travel) var(--ease);
+}
+/* The wrapper spans the line, so translating it by a share of its own
+   width moves the envelope along the line on the compositor. */
+.route-env {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 16px;
+  height: 0;
+  transform: translateX(calc(var(--p, 0) * 100%));
+  transition: transform var(--travel) var(--ease), opacity .25s ease;
+}
+.route-env svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: content-box;
+  padding: 3px;
+  border: 1px solid var(--blue-100);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--blue);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 10px -4px #2563eb55;
+  transition: scale .25s ease;
+}
+.route.is-moving .route-env svg { animation: route-bob .3s ease-in-out infinite alternate; }
+
+.route-stops {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.route-stops li { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.route-stops li:nth-child(1) { align-items: flex-start; text-align: left; }
+.route-stops li:nth-child(2) { align-items: center; text-align: center; }
+.route-stops li:nth-child(3) { align-items: flex-end; text-align: right; }
+.route-dot {
+  width: 12px;
+  height: 12px;
+  margin-bottom: 7px;
+  border: 2px solid #cbd5e4;
+  border-radius: 50%;
+  background: #fff;
+  transition: background-color .25s, border-color .25s, box-shadow .25s;
+}
+.route-stops b { color: #8792a7; font-size: 12px; font-weight: 700; transition: color .25s; }
+.route-stops small { color: var(--muted); font-size: 11px; opacity: 0; transition: opacity .25s; }
+
+.route-stops li.is-on .route-dot,
+.route.is-final .route-dot { border-color: var(--blue); background: var(--blue); box-shadow: 0 0 0 4px #2563eb1f; }
+.route-stops li.is-on:last-child .route-dot,
+.route.is-final li:last-child .route-dot { border-color: var(--ok); background: var(--ok); box-shadow: 0 0 0 4px #1674401f; }
+.route-stops li.is-on b, .route.is-final .route-stops b { color: var(--navy); }
+.route-stops li.is-on small, .route.is-final .route-stops small { opacity: 1; }
+.route-stops li.is-on .route-dot { animation: route-pop .3s cubic-bezier(.2, .7, .3, 1.6); }
+
+.route.is-final .route-fill { transform: scaleX(1); }
+.route.is-final .route-env,
+.route.is-delivered .route-env { opacity: 0; }
+.route.is-delivered .route-env svg { scale: .6; }
+
+/* ── Receipt rows ──────────────────────────────────────────────────────── */
+.route .body { position: relative; }
+/* Rows keep their final height while waiting/checking, so the card never jumps */
+.route .shot-row { min-height: 42px; }
+.route .shot-row:has(.badge) { min-height: 46px; }
+.route-ph { display: none; }
+.route .shot-row.is-wait > :not(.who):not(.route-ph),
+.route .shot-row.is-check > :not(.who):not(.route-ph) { display: none; }
+.route .shot-row.is-wait .route-ph {
+  display: block;
+  width: 84px;
+  height: 8px;
+  border-radius: 4px;
+  background: #eef1f7;
+}
+/* a verdict badge is short; a wide placeholder would wrap the long label */
+.route .shot-row.is-wait:has(.badge) .route-ph { width: 40px; }
+.route .shot-row.is-check .route-ph {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f4f6fa;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.15;  /* fits inside the 42px row of a plain value */
+}
+.route .shot-row.is-check .route-ph::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid #b6c1d4;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: route-spin .7s linear infinite;
+}
+.route .shot-row.is-check .route-ph::after { content: "Overujem"; }
+.route .shot-row.is-in > :not(.who):not(.route-ph) { animation: route-pop .32s cubic-bezier(.2, .7, .3, 1.35); }
+
+/* ── Stamp ─────────────────────────────────────────────────────────────── */
+.stamp {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  translate: -50% 0;   /* centred between labels and values; multiply keeps both readable */
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 6px 14px 5px;
+  border: 2.5px solid currentColor;
+  border-radius: 8px;
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+  color: #1b7a46;
+  text-transform: uppercase;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  rotate: -9deg;
+  opacity: 0;
+  visibility: hidden;
+  /* ink texture: speckled holes from turbulence noise */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -4 0 0 0 3.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -4 0 0 0 3.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.stamp b { font-size: 17px; font-weight: 900; letter-spacing: .14em; line-height: 1.15; }
+.stamp span { font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+
+.route.is-final .stamp,
+.route.is-stamped .stamp { opacity: .9; visibility: visible; }
+.route.is-stamped .stamp { animation: route-stamp .34s both; }
+.route.is-thud { animation: route-thud .24s ease-out; }
+
+@keyframes route-stamp {
+  0%   { opacity: 0; scale: 1.9; rotate: -17deg; animation-timing-function: cubic-bezier(.55, 0, .9, .4); }
+  62%  { opacity: .95; scale: .95; rotate: -8deg; animation-timing-function: ease-out; }
+  100% { opacity: .9; scale: 1; rotate: -9deg; }
+}
+@keyframes route-thud { 35% { translate: 0 3px; } }
+@keyframes route-bob { to { translate: 0 -3px; } }
+@keyframes route-pop { from { transform: scale(.7); opacity: .3; } }
+@keyframes route-spin { to { transform: rotate(360deg); } }
+
+/* First reset on page load must not animate away the final state */
+.route.no-motion, .route.no-motion *,
+.route.no-motion *::before, .route.no-motion *::after { transition: none !important; }
+
+@media (width <= 560px) {
+  .route-stops b { font-size: 11px; }
+  /* spinner only: the "Overujem" text would wrap the long label and the row would jump */
+  .route .shot-row.is-check .route-ph { padding: 5px 7px; }
+  .route .shot-row.is-check .route-ph::after { content: none; }
+  /* smaller and over the labels, so the timestamp and hash stay readable */
+  .stamp { left: 31%; padding: 5px 10px 4px; }
+  .stamp b { font-size: 14px; }
+  .stamp span { font-size: 9px; }
+}

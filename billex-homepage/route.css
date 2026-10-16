@@ -1,26 +1,15 @@
-/* Digitálny poštár — one invoice's journey on its delivery receipt.
+/* Digitálny poštár — one invoice's journey on its delivery receipt, looped.
    An envelope travels supplier → Billex postman → your inbox along the
    map at the top of the receipt. Each row of the receipt fills in at the
    stop where that fact becomes known, and on arrival the receipt is
-   stamped. The markup ships as ".is-final" (complete without JS and with
-   reduced motion); route.js resets it and plays the journey. */
+   stamped. Then it holds, fades out and starts over, forever, with no
+   interaction. The markup ships as ".is-final" (complete without JS and
+   with reduced motion); route.js resets it and runs the loop. */
 
 .route .bar { padding-right: 12px; }
-.route-replay {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: var(--blue);
-  font: 700 12px Inter, system-ui, sans-serif;
-  cursor: pointer;
-}
-.route-replay:hover { background: var(--blue-50); }
-.route-replay[hidden] { display: none; }
+/* fade between rounds of the loop */
+.route .route-map, .route .body { transition: opacity .35s ease; }
+.route.is-fading .route-map, .route.is-fading .body { opacity: 0; }
 
 /* ── Map ───────────────────────────────────────────────────────────────── */
 .route-map {
@@ -198,7 +187,7 @@
 @keyframes route-pop { from { transform: scale(.7); opacity: .3; } }
 @keyframes route-spin { to { transform: rotate(360deg); } }
 
-/* First reset on page load must not animate away the final state */
+/* Resetting between rounds must not animate (the envelope would fly home) */
 .route.no-motion, .route.no-motion *,
 .route.no-motion *::before, .route.no-motion *::after { transition: none !important; }
 

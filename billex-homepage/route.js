@@ -1,6 +1,8 @@
-/* Digitálny poštár — one invoice's journey. See route.css.
+/* Digitálny poštár — one invoice's journey, looped. See route.css.
    Rows carry data-at (the stop where they become known) and optionally
-   data-check (ms of "Overujem" before the verdict). */
+   data-check (ms of "Overujem" before the verdict). The loop only runs
+   while the card is on screen and the tab is visible; when it pauses
+   mid-way it restarts from the beginning. */
 (function () {
   var card = document.querySelector('[data-route]');
   if (!card) return;
@@ -8,11 +10,12 @@
   var map = card.querySelector('.route-map');
   var stops = card.querySelectorAll('.route-stops li');
   var rows = Array.prototype.slice.call(card.querySelectorAll('.shot-row[data-at]'));
-  var replay = card.querySelector('[data-replay]');
 
   var TRAVEL = 900;      // ms per leg, matches --travel in route.css
-  var START_DELAY = 300;
-  var run = 0;           // bumping this cancels a sequence in flight
+  var HOLD = 3000;       // stamped receipt stays up this long
+  var FADE = 350;        // matches the .is-fading opacity transition
+  var run = 0;           // bumping this cancels the loop in flight
+  var running = false;
 
   rows.forEach(function (row) {
     var ph = document.createElement('span');
@@ -28,17 +31,15 @@
 
   function setP(p) { map.style.setProperty('--p', p); }
 
+  // Back to the empty receipt in one frame, without transitions
   function reset() {
-    // snap back without animating (the envelope would otherwise fly home)
     card.classList.add('no-motion');
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { card.classList.remove('no-motion'); });
-    });
     card.classList.remove('is-final', 'is-moving', 'is-delivered', 'is-stamped', 'is-thud');
     stops.forEach(function (s) { s.classList.remove('is-on'); });
     rows.forEach(function (r) { r.classList.remove('is-check', 'is-in'); r.classList.add('is-wait'); });
     setP(0);
-    replay.hidden = true;
+    void card.offsetHeight;
+    card.classList.remove('no-motion');
   }
 
   function reach(i) { stops[i].classList.add('is-on'); }
@@ -68,10 +69,11 @@
     return wait(TRAVEL, id).then(function () { card.classList.remove('is-moving'); });
   }
 
-  function play() {
-    var id = ++run;
+  // One round: fade in empty, travel, stamp, hold, fade out
+  function cycle(id) {
     reset();
-    wait(START_DELAY, id).then(function () {
+    card.classList.remove('is-fading');
+    return wait(FADE, id).then(function () {
       reach(0);
       return checkRows(0, id);
     }).then(function () {
@@ -96,27 +98,34 @@
       return wait(190, id);    // the moment the stamp hits the paper
     }).then(function () {
       card.classList.add('is-thud');
-      return wait(700, id);
+      return wait(HOLD, id);
     }).then(function () {
-      replay.hidden = false;
-    }).catch(function () { /* cancelled by a newer run */ });
+      card.classList.add('is-fading');
+      return wait(FADE, id);
+    });
   }
 
-  replay.addEventListener('click', function () {
-    play();
-    card.setAttribute('tabindex', '-1');
-    card.focus({ preventScroll: true });
-  });
+  function start() {
+    if (running) return;
+    running = true;
+    var id = ++run;
+    // flat loop rather than recursion, so promises don't pile up over hours
+    (function loop() { cycle(id).then(loop, function () { /* stopped */ }); })();
+  }
+  function stop() {
+    if (!running) return;
+    running = false;
+    run++;
+  }
 
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduced || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) { start(); return; }
 
-  reset();
-
-  var io = new IntersectionObserver(function (entries) {
-    if (!entries.some(function (e) { return e.isIntersecting; })) return;
-    io.disconnect();
-    play();
-  }, { threshold: 0.5 });
-  io.observe(card);
+  var visible = false;
+  function update() { visible && !document.hidden ? start() : stop(); }
+  new IntersectionObserver(function (entries) {
+    visible = entries[entries.length - 1].isIntersecting;
+    update();
+  }, { threshold: 0.3 }).observe(card);
+  document.addEventListener('visibilitychange', update);
 })();

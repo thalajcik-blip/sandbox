@@ -349,92 +349,35 @@ html { scroll-padding-top: 76px; }
             takže ho odberateľovi načíta aj jeho program.</p>
           <p><b>Partnerov si nemusíte prepisovať.</b> Zadáte IČO a údaje sa doplnia z registra —
             slovenského aj českého. Čo raz uložíte, nabudúce len vyberiete.</p>
-          <p class="inv-hint" data-inv-hint>Kliknite na funkciu a ukážeme ju v náhľade.</p>
-          <ul class="after-list inv-list" data-inv-list>
-            <li><button type="button" data-show="recurring" aria-pressed="false" aria-controls="inv-shot"><b>Pravidelné faktúry</b> — vystavia sa samy, v termíne, ktorý určíte</button></li>
-            <li><button type="button" data-show="proforma" aria-pressed="false" aria-controls="inv-shot"><b>Predfaktúry</b> s automatickým vyhotovením faktúry po zaplatení</button></li>
-            <li><button type="button" data-show="reminders" aria-pressed="false" aria-controls="inv-shot"><b>Upomienky</b>, ktoré sa zastavia samy, keď platba dorazí</button></li>
-            <li><button type="button" data-show="matching" aria-pressed="false" aria-controls="inv-shot"><b>Párovanie platieb</b> z banky — import výpisu aj automatické napojenie</button></li>
-            <li><button type="button" data-show="quotes" aria-pressed="false" aria-controls="inv-shot"><b>Cenové ponuky</b> online, s premenou na faktúru jedným klikom</button></li>
-            <li><button type="button" data-show="branding" aria-pressed="false" aria-controls="inv-shot"><b>Vlastné logo</b>, vlastné číselné rady, vlastné texty</button></li>
+          <ul class="after-list">
+            <li><b>Pravidelné faktúry</b> — vystavia sa samy, v termíne, ktorý určíte</li>
+            <li><b>Predfaktúry</b> s automatickým vyhotovením faktúry po zaplatení</li>
+            <li><b>Upomienky</b>, ktoré sa zastavia samy, keď platba dorazí</li>
+            <li><b>Párovanie platieb</b> z banky — import výpisu aj automatické napojenie</li>
+            <li><b>Cenové ponuky</b> online, s premenou na faktúru jedným klikom</li>
+            <li><b>Vlastné logo</b>, vlastné číselné rady, vlastné texty</li>
           </ul>
         </div>
-        <div class="shot inv" id="inv-shot" aria-label="Náhľad editora faktúry" data-inv>
-          <div class="bar"><i></i><i></i><i></i><span data-inv-title>Faktúra 2026/000412</span>
-            <button class="inv-bar-btn" type="button" data-inv-back aria-label="Späť na faktúru" hidden>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-              Späť<span class="inv-wide">&nbsp;na faktúru</span></button>
-            <button class="inv-bar-btn" type="button" data-inv-replay hidden>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-              Znova</button></div>
-          <div class="body inv-views">
-
-            <!-- Editor: fills itself in (inv.js) -->
-            <div class="inv-view is-active" data-view="editor" data-title="Faktúra 2026/000412">
-              <div class="inv-field" style="--r:0">
-                <span class="inv-label">IČO odberateľa</span>
-                <span class="inv-input"><span class="num" data-inv-ico>36412783</span><i class="inv-caret"></i></span>
-              </div>
-              <div class="shot-row inv-company" style="--r:1" data-inv-step="company">
-                <span class="who">Drevovýroba Kováč, s.r.o.<small>Partizánska 14, 984 01 Lučenec · DIČ 2021765431</small></span>
-                <span class="badge g">Z registra</span>
-              </div>
-              <div class="shot-row" style="--r:2" data-inv-step="line"><span class="who">Motorová nafta<small>820 l × 1,284 €</small></span>
-                <span class="amt">1 052,88 €</span></div>
-              <div class="shot-row" style="--r:3" data-inv-step="line"><span class="who">Prepravné<small>1 ks × 40,00 €</small></span>
-                <span class="amt">40,00 €</span></div>
-              <div class="shot-row" style="--r:4" data-inv-step="line"><span class="who">DPH 23 %</span><span class="amt">251,36 €</span></div>
-              <div class="shot-row inv-total" style="--r:5" data-inv-step="line"><span class="who"><b>Na úhradu</b></span>
-                <span class="badge g" data-inv-step="send">Odoslať cez poštára</span>
-                <span class="amt"><b class="num" data-inv-total="1344.24">1 344,24 €</b></span></div>
+        <div class="shot inv" aria-label="Náhľad editora faktúry" data-inv>
+          <div class="bar"><i></i><i></i><i></i><span>Faktúra 2026/000412</span></div>
+          <div class="body">
+            <!-- inv.js replays this invoice in an endless loop -->
+            <div class="inv-field">
+              <span class="inv-label">IČO odberateľa</span>
+              <span class="inv-input"><span class="num" data-inv-ico>36412783</span><i class="inv-caret"></i></span>
             </div>
-
-            <div class="inv-view is-off" data-view="recurring" data-title="Pravidelná faktúra · Servis vozidiel" inert>
-              <div class="shot-row" style="--r:0"><span class="who">Opakovanie<small>Odberateľ: Drevovýroba Kováč, s.r.o.</small></span><span class="amt">každý mesiac, 1. deň</span></div>
-              <div class="shot-row" style="--r:1"><span class="who">1. 10. 2026<small>FA 2026/000398 · 180,00 €</small></span><span class="badge g">Vystavená a odoslaná</span></div>
-              <div class="shot-row" style="--r:2"><span class="who">1. 11. 2026</span><span class="badge b">Naplánovaná</span></div>
-              <div class="shot-row" style="--r:3"><span class="who">1. 12. 2026</span><span class="badge b">Naplánovaná</span></div>
-              <p class="inv-note" style="--r:4">Vystaví sa sama a odíde cez poštára. Vy nemusíte nič.</p>
+            <div class="shot-row inv-company" data-inv-step="company">
+              <span class="who">Drevovýroba Kováč, s.r.o.<small>Partizánska 14, 984 01 Lučenec · DIČ 2021765431</small></span>
+              <span class="badge g">Z registra</span>
             </div>
-
-            <div class="inv-view is-off" data-view="proforma" data-title="Predfaktúra PF 2026/0031" inert>
-              <div class="shot-row" style="--r:0"><span class="who">Predfaktúra PF 2026/0031<small>Záloha na drevené europalety</small></span><span class="amt">600,00 €</span></div>
-              <div class="shot-row" style="--r:1"><span class="who">Platba z banky</span><span class="badge g">Prijatá 12. 9.</span></div>
-              <div class="shot-row inv-arrow" style="--r:2"><span class="who">Faktúra 2026/000413<small>Daňový doklad k prijatej platbe</small></span><span class="badge b">Vystavená automaticky</span></div>
-              <p class="inv-note" style="--r:3">Faktúru po zaplatení nemusíte vystavovať ručne — stačí, že platba prišla.</p>
-            </div>
-
-            <div class="inv-view is-off" data-view="reminders" data-title="Upomienky · FA 2026/000398" inert>
-              <div class="shot-row" style="--r:0"><span class="who">Splatnosť</span><span class="amt">15. 9. 2026</span></div>
-              <div class="shot-row" style="--r:1"><span class="who">1. upomienka<small>e-mailom aj cez poštára</small></span><span class="badge w">Odoslaná 18. 9.</span></div>
-              <div class="shot-row" style="--r:2"><span class="who">Platba prišla<small>spárovaná s výpisom z banky</small></span><span class="badge g">22. 9.</span></div>
-              <div class="shot-row is-void" style="--r:3"><span class="who">2. upomienka<small>plánovaná na 25. 9.</small></span><span class="badge n">Zrušená sama</span></div>
-              <p class="inv-note" style="--r:4">Odberateľ, ktorý už zaplatil, upomienku nedostane.</p>
-            </div>
-
-            <div class="inv-view is-off" data-view="matching" data-title="Banka · výpis z 14. 9. 2026" inert>
-              <div class="shot-row" style="--r:0"><span class="who num">+1 344,24 €<small>VS 2026000412 · Drevovýroba Kováč</small></span><span class="badge g">FA 2026/000412</span></div>
-              <div class="shot-row" style="--r:1"><span class="who num">+213,90 €<small>VS 2026000397 · Pekáreň Lipa</small></span><span class="badge g">FA 2026/000397</span></div>
-              <div class="shot-row" style="--r:2"><span class="who num">+500,00 €<small>bez VS · Stavby Orava s.r.o.</small></span><span class="badge w">Návrh: FA 2026/000405</span></div>
-              <p class="inv-note" style="--r:3">Spárované faktúry sa označia ako zaplatené. Pri nejasnej platbe navrhneme, kam patrí.</p>
-            </div>
-
-            <div class="inv-view is-off" data-view="quotes" data-title="Cenová ponuka CP 2026/031" inert>
-              <div class="shot-row" style="--r:0"><span class="who">Odberateľ</span><span class="amt">Drevovýroba Kováč, s.r.o.</span></div>
-              <div class="shot-row" style="--r:1"><span class="who">Spolu s DPH<small>3 položky</small></span><span class="amt">2 480,00 €</span></div>
-              <div class="shot-row" style="--r:2"><span class="who">Stav<small>klient potvrdil cez odkaz, bez tlače a podpisov</small></span><span class="badge g">Prijatá 10. 9.</span></div>
-              <div class="inv-action" style="--r:3"><span>Premeniť na faktúru</span><svg width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg></div>
-            </div>
-
-            <div class="inv-view is-off" data-view="branding" data-title="Vzhľad faktúry" inert>
-              <div class="inv-paper" style="--r:0">
-                <span class="inv-logo">Vaše logo</span>
-                <span class="inv-paper-h"><b>FAKTÚRA</b><span class="num">FA2026/000412</span></span>
-              </div>
-              <div class="shot-row" style="--r:1"><span class="who">Číselný rad<small>FA{RRRR}/{NNNNNN}</small></span><span class="amt num">FA2026/000412</span></div>
-              <div class="shot-row" style="--r:2"><span class="who">Text pod faktúrou</span><span class="amt">Ďakujeme za spoluprácu.</span></div>
-              <div class="shot-row" style="--r:3"><span class="who">Farba dokladu</span><span class="inv-swatches"><i style="background:#17234a"></i><i style="background:#2563eb"></i><i style="background:#167440"></i></span></div>
-            </div>
+            <div class="shot-row" data-inv-step="line"><span class="who">Motorová nafta<small>820 l × 1,284 €</small></span>
+              <span class="amt">1 052,88 €</span></div>
+            <div class="shot-row" data-inv-step="line"><span class="who">Prepravné<small>1 ks × 40,00 €</small></span>
+              <span class="amt">40,00 €</span></div>
+            <div class="shot-row" data-inv-step="line"><span class="who">DPH 23 %</span><span class="amt">251,36 €</span></div>
+            <div class="shot-row inv-total" data-inv-step="line"><span class="who"><b>Na úhradu</b></span>
+              <span class="badge g" data-inv-step="send">Odoslať cez poštára</span>
+              <span class="amt"><b class="num" data-inv-total="1344.24">1 344,24 €</b></span></div>
           </div>
         </div>
       </div>

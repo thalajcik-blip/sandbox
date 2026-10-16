@@ -1,96 +1,13 @@
-/* Fakturácia — self-filling editor + feature views.
+/* Fakturácia — self-filling invoice, endless loop.
    The editor types an IČO, "finds" the company in the register, adds the
-   lines and counts up the total. The feature list on the left switches
-   the preview to a small view of each feature. All views share one grid
-   cell, so the card is always as tall as the tallest view and switching
-   never moves the layout. Inactive views are .is-off + [inert]: invisible
-   and out of the accessibility tree, but still in layout. ([hidden] can't
-   be used: the page's Tailwind base forces it to display:none !important.) */
+   lines and counts up the total, holds the finished invoice for a moment,
+   fades out and starts over. No interaction. Pending rows keep their
+   space (opacity only), so the card never changes size. The markup is the
+   finished invoice, which is also the no-JS / reduced-motion state. */
 
-.inv .bar { padding-right: 12px; }
-.inv .bar [data-inv-title] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.inv-bar-btn {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: var(--blue);
-  font: 700 12px Inter, system-ui, sans-serif;
-  cursor: pointer;
-}
-.inv-bar-btn:hover { background: var(--blue-50); }
-.inv-bar-btn[hidden] { display: none; }
+.inv .body { transition: opacity .35s ease; }
+.inv.is-fading .body { opacity: 0; }
 
-/* ── Views ─────────────────────────────────────────────────────────────── */
-.inv-views { display: grid; }
-.inv-view { grid-area: 1 / 1; min-width: 0; transition: opacity .25s ease, visibility 0s; }
-.inv-view.is-off {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .18s ease, visibility 0s .18s;
-}
-.inv-view > * { transition: opacity .3s ease, translate .3s cubic-bezier(.2, .7, .3, 1); }
-.inv-view.is-stagger > * { transition-delay: calc(var(--r, 0) * 55ms + 80ms); }
-.inv-view.is-entering > * { opacity: 0; translate: 0 6px; }
-
-.inv .badge.b { color: #1d4ed8; background: var(--blue-50); border: 1px solid var(--blue-100); }
-.inv .badge.n { color: var(--muted); background: #f4f6fa; border: 1px solid var(--line); }
-.inv .is-void .who { color: #94a0b4; text-decoration: line-through; text-decoration-color: #b6c1d4; }
-.inv-arrow .who::before { content: "↳ "; color: var(--blue); }
-/* .split p would otherwise restyle notes, the preview sits inside .split */
-.split .inv-note { margin: 12px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
-
-.inv-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 38px;
-  margin-top: 14px;
-  border-radius: 9px;
-  background: var(--blue);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow: 0 5px 14px #2563eb33;
-}
-
-.inv-paper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fbfcff;
-}
-.inv-logo {
-  display: grid;
-  place-items: center;
-  width: 92px;
-  height: 36px;
-  border: 1.5px dashed #9fb0d2;
-  border-radius: 7px;
-  color: #6b82b5;
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-.inv-paper-h { display: grid; gap: 1px; text-align: right; }
-.inv-paper-h b { color: var(--navy); font-size: 12px; letter-spacing: .14em; }
-.inv-paper-h span { color: var(--muted); font-size: 11.5px; }
-.inv-swatches { display: flex; gap: 7px; }
-.inv-swatches i { width: 18px; height: 18px; border-radius: 50%; }
-.inv-swatches i:first-child { outline: 2px solid var(--blue); outline-offset: 2px; }
-
-/* ── Editor ────────────────────────────────────────────────────────────── */
 .inv-field {
   display: flex;
   align-items: center;
@@ -123,9 +40,11 @@
 .inv [data-inv-step].is-pending { opacity: 0; translate: 0 6px; }
 .inv [data-inv-step="send"].is-in { animation: inv-pop .34s cubic-bezier(.2, .7, .3, 1.4); }
 
-/* register lookup: the company row shows a pill until the data "arrives" */
+/* Register lookup: the company row shows a pill until the data "arrives" */
 .inv-company { position: relative; }
 .inv-company > * { transition: opacity .25s ease; }
+/* already hidden while pending, so the row fades in showing only the pill */
+.inv-company.is-pending > *,
 .inv-company.is-search > * { opacity: 0; }
 .inv-company::after {
   content: "Hľadám v registri…";
@@ -165,54 +84,14 @@
 .inv-company.is-search::before,
 .inv-company.is-search::after { opacity: 1; }
 
-/* ── Feature list on the left ──────────────────────────────────────────── */
-.split .inv-hint { margin: 18px 0 0; color: var(--blue); font-size: 13px; font-weight: 700; }
-.split .inv-list { margin-top: 10px; }
-.inv-list li { margin: 4px 0; }
-.inv-list li::before { top: 4px; }
-.inv-list button {
-  position: relative;
-  display: block;
-  width: calc(100% + 16px);
-  margin: 0 -8px;
-  padding: 4px 30px 4px 8px;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-  color: inherit;
-  font: inherit;
-  line-height: 1.6;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color .15s;
-}
-.inv-list button::after {
-  content: "›";
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  translate: 0 -52%;
-  color: var(--blue);
-  font-size: 18px;
-  font-weight: 700;
-  opacity: 0;
-  transition: opacity .15s, translate .15s;
-}
-.inv-list button:hover { background: #f3f6fd; }
-.inv-list button:hover::after { opacity: .6; }
-.inv-list button[aria-pressed="true"] { background: var(--blue-50); }
-.inv-list button[aria-pressed="true"] b { color: #1d4ed8; }
-.inv-list button[aria-pressed="true"]::after { opacity: 1; translate: 2px -52%; }
-
 @keyframes inv-blink { 50% { opacity: 0; } }
 @keyframes inv-spin { to { transform: rotate(360deg); } }
 @keyframes inv-pop { from { transform: scale(.7); opacity: .3; } }
 
-/* First reset on page load must not animate */
+/* Resetting between loops must not animate */
 .inv.no-motion, .inv.no-motion *,
 .inv.no-motion *::before, .inv.no-motion *::after { transition: none !important; }
 
 @media (width <= 560px) {
   .inv-input { min-width: 0; }
-  .inv-bar-btn .inv-wide { display: none; }
 }

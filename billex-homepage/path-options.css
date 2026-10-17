@@ -1,0 +1,12 @@
+#cesty .plan.featured {
+  background: var(--billex-surface-recommended);
+}
+
+@media (width > 900px) {
+  #cesty .plan .for { min-height: 3.2em; }
+}
+
+@media (900px < width <= 1100px) {
+  #cesty .plan h3 { min-height: 2.5em; }
+}
+

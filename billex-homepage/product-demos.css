@@ -1,0 +1,43 @@
+.product-stage {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  padding: 40px 24px;
+  display: grid;
+  align-items: center;
+}
+
+.product-stage::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 30px 16px;
+  border-radius: var(--billex-radius-art);
+  background: var(--billex-surface-art);
+  transform: rotate(-5deg);
+  pointer-events: none;
+}
+
+.product-stage-receipt::before { transform: rotate(5deg); }
+
+.product-stage > .shot {
+  width: 100%;
+  min-width: 0;
+  border-color: var(--billex-border-demo);
+  border-radius: var(--billex-radius-demo);
+  box-shadow: var(--billex-shadow-demo);
+}
+
+.product-stage .shot > .bar { height: var(--billex-toolbar-height); background: var(--billex-surface-chrome); }
+.product-stage-receipt .shot-cap { font-size: 13px; }
+
+@media (width <= 900px) {
+  .product-stage { width: 100%; max-width: 600px; justify-self: center; }
+}
+
+@media (width <= 560px) {
+  .product-stage { padding: 28px 12px; }
+  .product-stage::before { inset: 24px 10px; border-radius: var(--billex-radius-art); transform: rotate(-3deg); }
+  .product-stage-receipt::before { transform: rotate(3deg); }
+  .product-stage > .shot { border-radius: var(--billex-radius-demo); }
+}

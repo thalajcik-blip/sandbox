@@ -1,0 +1,40 @@
+#fakturacia .addons,
+#partneri .addons { gap: 0; }
+
+#fakturacia .addon,
+#partneri .addon {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0 28px;
+}
+
+#fakturacia .addon:first-child,
+#partneri .addon:first-child { padding-left: 0; }
+
+#fakturacia .addon:last-child,
+#partneri .addon:last-child { padding-right: 0; }
+
+#fakturacia .addon + .addon,
+#partneri .addon + .addon { border-left: 1px solid #dce3f0; }
+
+@media (width > 900px) {
+  #partneri > .wrap > .source { margin-top: 40px; }
+}
+
+@media (width <= 900px) {
+  #fakturacia .addon,
+  #partneri .addon { padding: 24px 0; }
+
+  #fakturacia .addon:first-child,
+  #partneri .addon:first-child { padding-top: 0; }
+
+  #fakturacia .addon:last-child,
+  #partneri .addon:last-child { padding-bottom: 0; }
+
+  #fakturacia .addon + .addon,
+  #partneri .addon + .addon {
+    border-left: 0;
+    border-top: 1px solid #dce3f0;
+  }
+}

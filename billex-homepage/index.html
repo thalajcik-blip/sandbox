@@ -141,15 +141,33 @@ html:has(body .hero) body {
 
 /* kotvy z navigácie nesmú skončiť pod hlavičkou */
 html { scroll-padding-top: 76px; }
+/* pod ~480 px sa navigacia zalomi do dvoch riadkov a hlavicka ma 107 px
+   (presnu hodnotu doladi skript nizsie; toto je fallback bez JS) */
+@media (width <= 560px) { html { scroll-padding-top: 120px; } }
 
 @media (prefers-reduced-motion: reduce) {
   .header { transition: none; }
 }
 
 </style>
+  <style id="section-heading-styles">
+    .section-head > h2 { font-weight: 700; }
+    .hero .eyebrow, .section-head > .eyebrow { font-size: 14px; }
+    .section-head > .eyebrow { color: var(--billex-brand-label); }
+    .addon > h3 { font-weight: 700; }
+    #partneri .transparency h2 { font-size: 28px; font-weight: 700; }
+    .billex-developer-grid .ui-section-title { font-size: 28px; font-weight: 700; }
+    .billex-developer-grid .billex-developer-eyebrow { font-size: 14px; font-weight: 800; text-transform: uppercase; }
+  </style>
+  <link rel="stylesheet" href="design-system.css">
   <link rel="stylesheet" href="hero-live.css">
+  <link rel="stylesheet" href="app-icons.css">
   <link rel="stylesheet" href="route.css">
   <link rel="stylesheet" href="inv.css">
+  <link rel="stylesheet" href="product-demos.css">
+  <link rel="stylesheet" href="support-blocks.css">
+  <link rel="stylesheet" href="path-options.css">
+  <link rel="stylesheet" href="partner-panel.css">
 </head>
 <body class="h-full bg-ink-50 text-ink-900 antialiased">
 
@@ -234,6 +252,17 @@ html { scroll-padding-top: 76px; }
           <a href="#preco">Čo to pre vás znamená</a></p>
       </div>
 
+      <div class="hero-scene">
+      <div class="hero-photo" aria-hidden="true">
+        <picture class="hero-photo-frame">
+          <source media="(width > 560px)" srcset="hero_01.webp" type="image/webp">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="1080" height="990" alt="" decoding="async">
+        </picture>
+        <picture class="hero-photo-frame hero-photo-frame-next">
+          <source media="(width > 560px)" srcset="hero_02.webp" type="image/webp">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="1080" height="990" alt="" decoding="async">
+        </picture>
+      </div>
       <div class="shot inbox" aria-label="Náhľad doručenej pošty" data-inbox>
         <div class="bar"><i></i><i></i><i></i><span>Doručená pošta</span>
           <b class="inbox-live"><i></i>naživo</b></div>
@@ -263,6 +292,7 @@ html { scroll-padding-top: 76px; }
           </ul>
         </div>
       </div>
+      </div>
     </div>
   </section>
 
@@ -270,14 +300,14 @@ html { scroll-padding-top: 76px; }
     <div class="wrap">
       <div class="section-head"><h2>8 aplikácií pre vašu firmu</h2></div>
       <div class="addons three">
-                  <div class="addon"><h3>Fakturácia</h3><p>Faktúry, zálohy, dobropisy a pravidelné doklady.</p></div>
-                  <div class="addon"><h3>Schránka</h3><p>Prijaté doklady a e-faktúry cez digitálneho poštára.</p></div>
-                  <div class="addon"><h3>Peniaze</h3><p>Platby, banka, pohľadávky a prehľady.</p></div>
-                  <div class="addon"><h3>Účtovníctvo a dane</h3><p>Účtovné podklady, daňové výstupy a spolupráca s účtovníkom.</p></div>
-                  <div class="addon"><h3>Obchod a CRM</h3><p>Partneri, cenové ponuky a obchodné prípady.</p></div>
-                  <div class="addon"><h3>Sklad</h3><p>Skladové karty, zásoby a pohyby tovaru.</p></div>
-                  <div class="addon"><h3>Práca</h3><p>Úlohy, evidencia času a dochádzka.</p></div>
-                  <div class="addon"><h3>Integrácie</h3><p>API a prepojenia s vašimi systémami.</p></div>
+                  <div class="addon"><img class="app-icon" src="icons/fakturacia.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Fakturácia</h3><p>Faktúry, zálohy, dobropisy a&nbsp;pravidelné doklady.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/schranka.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Schránka</h3><p>Prijaté doklady a&nbsp;e-faktúry cez digitálneho poštára.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/peniaze.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Peniaze</h3><p>Platby, banka, pohľadávky a&nbsp;prehľady.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/uctovnictvo.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Účtovníctvo a&nbsp;dane</h3><p>Účtovné podklady, daňové výstupy a&nbsp;spolupráca s účtovníkom.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/obchod.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Obchod a&nbsp;CRM</h3><p>Partneri, cenové ponuky a&nbsp;obchodné prípady.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/sklad.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Sklad</h3><p>Skladové karty, zásoby a&nbsp;pohyby tovaru.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/praca.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Práca</h3><p>Úlohy, evidencia času a&nbsp;dochádzka.</p></div></div>
+                  <div class="addon"><img class="app-icon" src="icons/integracie.webp" width="72" height="72" alt="" loading="lazy" decoding="async"><div class="app-copy"><h3>Integrácie</h3><p>API a&nbsp;prepojenia s vašimi systémami.</p></div></div>
               </div>
     </div>
   </section>
@@ -357,6 +387,7 @@ html { scroll-padding-top: 76px; }
             <li><b>Vlastné logo</b>, vlastné číselné rady, vlastné texty</li>
           </ul>
         </div>
+        <div class="product-stage product-stage-invoice">
         <div class="shot inv" aria-label="Náhľad editora faktúry" data-inv>
           <div class="bar"><i></i><i></i><i></i><span data-fill="Faktúra {YYYY}/000412">Faktúra 2026/000412</span></div>
           <div class="body">
@@ -379,6 +410,7 @@ html { scroll-padding-top: 76px; }
               <span class="badge g" data-inv-step="send">Odoslať cez poštára</span>
               <span class="amt"><b class="num" data-inv-total="1344.24">1 344,24 €</b></span></div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -435,6 +467,7 @@ html { scroll-padding-top: 76px; }
             <a class="secondary-link" href="https://www.billex.sk/cennik-postara">Pozrieť cenník poštára</a>
           </div>
         </div>
+        <div class="product-stage product-stage-receipt">
         <div class="shot route is-final" aria-label="Náhľad doručenky" data-route>
           <div class="bar"><i></i><i></i><i></i><span>Doručenka</span></div>
           <div class="route-map" aria-hidden="true">
@@ -457,6 +490,7 @@ html { scroll-padding-top: 76px; }
           <p class="shot-cap" style="padding:0 18px 16px">Doručenka zostáva v archíve aj vtedy, keď
             faktúru vymažete natrvalo — je to dôkaz o doručení.</p>
         </div>
+        </div>
       </div>
     </div>
   </section>
@@ -472,9 +506,12 @@ html { scroll-padding-top: 76px; }
       </div>
 
       <div class="transparency aml">
-        <div class="aml-card">
+        <div class="aml-card" data-partner-panel>
+          <div class="aml-chrome" aria-hidden="true"><i></i><i></i><i></i><span></span></div>
+          <div class="aml-company">
           <div class="h"><span class="dot"></span> Stavebniny Juh s.r.o.</div>
           <div class="ico">IČO 46882190 · DIČ 2023881190</div>
+          </div>
           <ul class="aml-list">
             <li><span class="m x">✕</span><span><b>Dlžník Sociálnej poisťovne</b> — od júla 2026, 12 480,00 €</span></li>
             <li><span class="m w">!</span><span><b>Tri zmeny konateľa</b> za 18 mesiacov</span></li>
@@ -584,7 +621,7 @@ html { scroll-padding-top: 76px; }
   <section class="section alt" id="preco">
     <div class="wrap">
       <div class="section-head">
-        <h2>Prečo to riešiť teraz, a nie v decembri 2026</h2>
+        <h2>Prečo to riešiť teraz, a&nbsp;nie v decembri 2026</h2>
       </div>
       <div class="why">
         <div>
@@ -686,6 +723,13 @@ html { scroll-padding-top: 76px; }
   var header = document.querySelector('.header');
   if (!header) return;
 
+  /* kotvy maju pristat pod hlavickou v kazdej sirke — vyska sa meni podla zalomenia navigacie */
+  function syncScrollPadding() {
+    document.documentElement.style.scrollPaddingTop = (header.offsetHeight + 12) + 'px';
+  }
+  window.addEventListener('resize', syncScrollPadding, { passive: true });
+  syncScrollPadding();
+
   var REVEAL_AT = 4;    // px pohybu hore, po ktorých sa hlavička vráti (nízke = reaguje hneď)
   var HIDE_AT   = 10;   // px pohybu dole, po ktorých sa skryje (vyššie = neblikoce)
   var TOP_ZONE  = 120;  // do tejto výšky je hlavička vždy viditeľná
@@ -733,4 +777,5 @@ html { scroll-padding-top: 76px; }
 <script src="hero-live.js" defer></script>
 <script src="route.js" defer></script>
 <script src="inv.js" defer></script>
+<script src="partner-panel.js" defer></script>
 </body></html>

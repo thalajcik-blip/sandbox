@@ -1,0 +1,79 @@
+#partneri .transparency.aml {
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 48px;
+  padding: 48px;
+  background: radial-gradient(ellipse at 0 0, #304a8155, transparent 65%), linear-gradient(135deg, #17234a, #111d3d);
+}
+
+#partneri .aml-card {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #ffffff30;
+  border-radius: var(--billex-radius-demo);
+  background: #202e50;
+  box-shadow: var(--billex-shadow-inverse);
+}
+
+.aml-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--billex-toolbar-height);
+  padding: 0 16px;
+  border-bottom: 1px solid #ffffff12;
+  background: #ffffff05;
+}
+
+.aml-chrome i { width: var(--billex-toolbar-dot); height: var(--billex-toolbar-dot); border-radius: 50%; background: #8596bb66; }
+.aml-chrome span { width: 38px; height: 5px; margin-left: auto; border-radius: 3px; background: #8596bb33; }
+.aml-company { padding: 20px 20px 18px; }
+
+#partneri .aml-list { display: grid; gap: 8px; margin: 0; padding: 0 14px 14px; }
+#partneri .aml-list li {
+  --check-color: var(--billex-status-warning-light);
+  --check-surface: color-mix(in srgb, var(--check-color) 4%, transparent);
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--billex-radius-control);
+  background: var(--check-surface);
+  box-shadow: inset 2px 0 0 color-mix(in srgb, var(--check-color) 42%, transparent);
+  transition: border-color .45s ease, background-color .45s ease, box-shadow .45s ease;
+}
+
+#partneri .aml-list li:has(.m.x) { --check-color: var(--billex-status-danger-light); }
+#partneri .aml-list li:has(.m.v) { --check-color: var(--billex-status-success-light); }
+#partneri .aml-list li .m {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--check-color);
+  background: color-mix(in srgb, var(--check-color) 13%, transparent);
+  line-height: 1;
+}
+
+#partneri .aml-list li.is-active {
+  border-color: color-mix(in srgb, var(--check-color) 46%, transparent);
+  background: color-mix(in srgb, var(--check-color) 10%, #202e50);
+  box-shadow: inset 2px 0 0 var(--check-color), 0 0 18px -10px var(--check-color);
+}
+
+@media (width <= 900px) {
+  #partneri .transparency.aml { grid-template-columns: 1fr; padding: 34px; gap: 32px; }
+  #partneri .aml-card { width: 100%; max-width: 440px; justify-self: center; }
+}
+
+@media (width <= 560px) {
+  #partneri .transparency.aml { padding: 24px 18px; }
+  .aml-company { padding: 18px 14px; }
+  #partneri .aml-list { padding: 0 10px 10px; }
+  #partneri .aml-list li { padding: 10px; gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #partneri .aml-list li { transition: none; }
+}

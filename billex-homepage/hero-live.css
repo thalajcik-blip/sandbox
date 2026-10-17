@@ -5,8 +5,69 @@
    Rows have a fixed height, so the box never changes size. The markup is
    five finished rows, which is also the no-JS / reduced-motion state. */
 
-.hero-grid { grid-template-columns: minmax(0, 1fr) 420px; }
+.hero-grid { grid-template-columns: minmax(0, 1fr) 520px; gap: 48px; padding-block: 40px; }
+.hero { min-height: auto; overflow: hidden; }
+@media (width > 900px) {
+  .hero-grid { padding-block: 80px; }
+}
+.hero-scene {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  height: 490px;
+}
+.hero-scene::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 46px 44px 35px 80px;
+  border-radius: var(--billex-radius-art);
+  background: var(--billex-surface-art);
+  transform: rotate(9deg);
+}
+.hero-photo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  height: 330px;
+  border: 3px solid #fff;
+  border-radius: var(--billex-radius-art);
+  background: linear-gradient(145deg, #e7edf2, #cbd8e1);
+  box-shadow: var(--billex-shadow-demo);
+  overflow: hidden;
+}
+.hero-photo-frame { position: absolute; inset: 0; }
+.hero-photo-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hero-photo-frame-next { opacity: 0; }
+@media (width > 560px) and (prefers-reduced-motion: no-preference) {
+  .hero-photo-frame-next { animation: hero-photo-crossfade 12s ease-in-out infinite; }
+}
+@keyframes hero-photo-crossfade {
+  0%, 41.6667%, 100% { opacity: 0; }
+  50%, 91.6667% { opacity: 1; }
+}
+.hero-scene .inbox { z-index: 1; width: 400px; top: 24px; }
+.hero-scene .inbox .body { padding-inline: 12px; }
+.hero-scene .inbox .inbox-row { gap: 7px; }
+.hero-scene .inbox .who { font-size: 12px; }
+.hero-scene .inbox .badge { padding-inline: 7px; font-size: 10px; }
+.hero-scene .inbox .amt { font-size: 12px; }
+@media (900px < width <= 1100px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr) 450px; gap: 28px; }
+  .hero-scene .inbox { width: 380px; }
+  .hero-photo { width: 320px; }
+}
 @media (width <= 900px) { .hero-grid { grid-template-columns: 1fr; } }
+@media (width <= 900px) {
+  .hero-scene { width: min(100%, 520px); justify-self: center; }
+}
+@media (width <= 560px) {
+  .hero-grid { padding-block: 40px; gap: 28px; }
+  .hero-scene { height: auto; }
+  .hero-scene .inbox { width: 100%; top: 0; }
+  .hero-photo, .hero-scene::before { display: none; }
+}
 
 .inbox { --row: 58px; --rows: 5; }
 

@@ -33,6 +33,19 @@ python3 -m http.server 8090
 
 Then open <http://localhost:8090/billex-homepage/>.
 
+## Billex visual tokens
+
+`billex-homepage/design-system.css` owns shared visual tokens and base component
+styles. Load it before section styles, and reuse its variables there.
+
+- Blue 600 is for actions; accent 500 is for section labels.
+- Corner radii: controls 8 px, cards 12 px, product panels 16 px, feature blocks
+  20 px, decorative backplates and photos 24 px.
+- Shared shadows distinguish buttons, product demos, recommended plans, and
+  panels on dark backgrounds. Flat cards and open support blocks stay flat.
+- Product toolbars share a 40 px height and 8 px window dots.
+- App icons retain their per-asset optical size corrections and responsive sizes.
+
 ## Adding a demo
 
 1. Create `/<demo-name>/index.html` with its assets beside it.

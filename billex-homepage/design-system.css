@@ -1,0 +1,76 @@
+:root {
+  --blue: var(--color-accent-600);
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --navy: #17234a;
+  --line: #dfe5f0;
+  --billex-brand-label: var(--color-accent-600); /* 4,95 : 1 na #f8faff; Accent 500 mal pri 12-14 px len 3,5 : 1 */
+  --billex-brand-hover: #1d4ed8;
+  --billex-radius-control: 8px;
+  --billex-radius-card: 12px;
+  --billex-radius-demo: 16px;
+  --billex-radius-feature: 20px;
+  --billex-radius-art: 24px;
+  --billex-surface-chrome: #f8faff;
+  --billex-surface-art: #dce5ff;
+  --billex-surface-recommended: linear-gradient(150deg, #eaf1ff, #f6f9ff);
+  --billex-border-demo: #d5dff2;
+  --billex-toolbar-height: 40px;
+  --billex-toolbar-dot: 8px;
+  --billex-shadow-button: 0 5px 14px #2563eb33;
+  --billex-shadow-demo: 0 24px 48px -28px #17234a66, 0 4px 12px -8px #17234a26;
+  --billex-shadow-recommended: 0 18px 40px -28px #2563eb66;
+  --billex-shadow-inverse: 0 24px 48px -28px #03091b99;
+  --billex-focus-ring: #1d4ed8; /* 6,70 : 1; predtym #2563eb66 = 1,8 : 1 (WCAG 2.2 SC 1.4.11) */
+  --billex-status-danger-light: #ffa3aa;
+  --billex-status-warning-light: #f4c57d;
+  --billex-status-success-light: #8ee0bc;
+}
+
+.button { border-radius: var(--billex-radius-control); border-color: var(--line); }
+.button.primary { box-shadow: var(--billex-shadow-button); }
+.button.primary:hover { background: var(--billex-brand-hover); }
+
+.hero .eyebrow,
+.addon .kicker,
+.billex-developer-grid .billex-developer-eyebrow { color: var(--billex-brand-label); }
+
+.plan,
+.note,
+.dates,
+.billex-developer-grid li { border-radius: var(--billex-radius-card); border-color: var(--line); }
+.plan { position: relative; }
+.plan h3 { font-weight: 700; }
+.plan .tag { position: absolute; top: 0; left: 26px; margin: 0; transform: translateY(-50%); }
+.plan.featured { padding: 25px; background: var(--billex-surface-recommended); box-shadow: var(--billex-shadow-recommended); }
+
+.shot { border-radius: var(--billex-radius-demo); box-shadow: var(--billex-shadow-demo); }
+.shot > .bar { height: var(--billex-toolbar-height); background: var(--billex-surface-chrome); gap: 6px; }
+.shot > .bar > i { width: var(--billex-toolbar-dot); height: var(--billex-toolbar-dot); background: var(--line); }
+.transparency { border-radius: var(--billex-radius-feature); }
+
+.billex-developer-grid a {
+  border-radius: var(--billex-radius-control);
+  background: var(--blue);
+  box-shadow: var(--billex-shadow-button);
+  font-weight: 700;
+  transition: background-color .18s ease, box-shadow .18s ease;
+}
+.billex-developer-grid a:hover { background: var(--billex-brand-hover); }
+
+/* Aplikacne CSS vynucuje :where(a,button,input,select,textarea,[tabindex]):focus-visible
+   { outline: 2px solid var(--color-accent-700) !important }, takze na odkazoch a tlacidlach
+   vyhrava ono. Tento blok drzi rovnaky prstenec aj tam, kam to pravidlo nesiaha (<summary>),
+   a na strankach bez aplikacneho CSS. Hodnoty su zamerne zhodne s nim. */
+.button:focus-visible,
+.secondary-link:focus-visible,
+.nav-links a:focus-visible,
+.billex-developer-grid a:focus-visible,
+.faq summary:focus-visible {
+  outline: 2px solid var(--billex-focus-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button, .billex-developer-grid a { transition: none; }
+}

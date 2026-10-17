@@ -263,10 +263,12 @@ html { scroll-padding-top: 76px; }
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="1080" height="990" alt="" decoding="async">
         </picture>
       </div>
-      <div class="shot inbox" aria-label="Náhľad doručenej pošty" data-inbox>
-        <div class="bar"><i></i><i></i><i></i><span>Doručená pošta</span>
+      <div class="shot inbox" role="group" aria-label="Náhľad doručenej pošty" data-inbox>
+        <div class="bar" data-motion-toggle><i></i><i></i><i></i><span>Doručená pošta</span>
           <b class="inbox-live"><i></i>naživo</b></div>
-        <div class="body">
+        <!-- role=img: the list changes every few seconds, so screen readers get
+             one stable description instead of a moving target -->
+        <div class="body" role="img" aria-label="Faktúry priebežne prichádzajú do schránky a Billex každú skontroluje. Napríklad pri Palivá Východ, a.s. upozorní na zmenu účtu, pri Stavebniny Juh s.r.o. na duplicitu, ostatné sú v poriadku.">
           <!-- hero-live.js keeps this list running as an endless feed -->
           <ul class="inbox-list" data-list>
             <li class="shot-row inbox-row"><span class="dot hi"></span>
@@ -388,9 +390,9 @@ html { scroll-padding-top: 76px; }
           </ul>
         </div>
         <div class="product-stage product-stage-invoice">
-        <div class="shot inv" aria-label="Náhľad editora faktúry" data-inv>
-          <div class="bar"><i></i><i></i><i></i><span data-fill="Faktúra {YYYY}/000412">Faktúra 2026/000412</span></div>
-          <div class="body">
+        <div class="shot inv" role="group" aria-label="Náhľad editora faktúry" data-inv>
+          <div class="bar" data-motion-toggle><i></i><i></i><i></i><span data-fill="Faktúra {YYYY}/000412">Faktúra 2026/000412</span></div>
+          <div class="body" role="img" aria-label="Po zadaní IČO 36412783 sa odberateľ Drevovýroba Kováč, s.r.o. doplní z registra a faktúra na 1 344,24 € je pripravená na odoslanie cez poštára.">
             <!-- inv.js replays this invoice in an endless loop -->
             <span class="inv-intro-label" aria-hidden="true">Zadajte IČO odberateľa</span>
             <div class="inv-field">
@@ -468,8 +470,8 @@ html { scroll-padding-top: 76px; }
           </div>
         </div>
         <div class="product-stage product-stage-receipt">
-        <div class="shot route is-final" aria-label="Náhľad doručenky" data-route>
-          <div class="bar"><i></i><i></i><i></i><span>Doručenka</span></div>
+        <div class="shot route is-final" role="group" aria-label="Náhľad doručenky" data-route>
+          <div class="bar" data-motion-toggle><i></i><i></i><i></i><span>Doručenka</span></div>
           <div class="route-map" aria-hidden="true">
             <span class="route-line"><span class="route-fill"></span></span>
             <span class="route-env"><svg width="18" height="18"><use href="#i-mail"></use></svg></span>
@@ -479,7 +481,7 @@ html { scroll-padding-top: 76px; }
               <li><span class="route-dot"></span><b>Vaša schránka</b><small class="num">08:14:22</small></li>
             </ol>
           </div>
-          <div class="body">
+          <div class="body" role="img" aria-label="Faktúra prešla od dodávateľa cez poštára Billex do vašej schránky. Spĺňa normu EN 16931, účet je v zozname Finančnej správy a doručenka je opečiatkovaná ako doručená.">
             <div class="shot-row" data-at="0"><span class="who">Odosielateľ</span><span class="amt">0245:2020372237</span></div>
             <div class="shot-row" data-at="1" data-check="650"><span class="who">Norma EN 16931</span><span class="badge g">V poriadku</span></div>
             <div class="shot-row" data-at="1" data-check="500"><span class="who">Účet v zozname Finančnej správy</span><span class="badge g">Áno</span></div>
@@ -507,7 +509,7 @@ html { scroll-padding-top: 76px; }
 
       <div class="transparency aml">
         <div class="aml-card" data-partner-panel>
-          <div class="aml-chrome" aria-hidden="true"><i></i><i></i><i></i><span></span></div>
+          <div class="aml-chrome" data-motion-toggle><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><span aria-hidden="true"></span></div>
           <div class="aml-company">
           <div class="h"><span class="dot"></span> Stavebniny Juh s.r.o.</div>
           <div class="ico">IČO 46882190 · DIČ 2023881190</div>
@@ -774,6 +776,7 @@ html { scroll-padding-top: 76px; }
 
 </script>
 <script src="dates.js" defer></script>
+<script src="motion.js" defer></script>
 <script src="hero-live.js" defer></script>
 <script src="route.js" defer></script>
 <script src="inv.js" defer></script>

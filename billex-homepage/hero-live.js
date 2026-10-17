@@ -97,15 +97,18 @@
   }
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!('IntersectionObserver' in window)) { start(); return; }
 
-  var visible = false;
-  new IntersectionObserver(function (entries) {
-    visible = entries[entries.length - 1].isIntersecting;
-    visible && !document.hidden ? start() : stop();
-  }, { threshold: 0.2 }).observe(card);
-
-  document.addEventListener('visibilitychange', function () {
-    visible && !document.hidden ? start() : stop();
-  });
+  // runs only while on screen, the tab is visible and nobody pressed pause
+  var Motion = window.BillexMotion || { paused: false, onChange: function () {} };
+  var visible = !('IntersectionObserver' in window);
+  function update() { visible && !document.hidden && !Motion.paused ? start() : stop(); }
+  if (!visible) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[entries.length - 1].isIntersecting;
+      update();
+    }, { threshold: 0.2 }).observe(card);
+  }
+  document.addEventListener('visibilitychange', update);
+  Motion.onChange(update);
+  update();
 })();

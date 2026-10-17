@@ -6,6 +6,7 @@
   if (!checks.length) return;
 
   var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var Motion = window.BillexMotion || { paused: false, onChange: function () {} };
   var timer = null;
   var nextCheck = 0;
   var visible = false;
@@ -27,7 +28,7 @@
   }
 
   function update() {
-    if (visible && !document.hidden && !motion.matches) {
+    if (visible && !document.hidden && !motion.matches && !Motion.paused) {
       if (timer === null) timer = window.setTimeout(highlightNext, 600);
     } else {
       window.clearTimeout(timer);
@@ -44,4 +45,5 @@
 
   document.addEventListener('visibilitychange', update);
   motion.addEventListener('change', update);
+  Motion.onChange(update);
 })();

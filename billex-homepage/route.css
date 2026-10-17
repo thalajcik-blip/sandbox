@@ -86,7 +86,9 @@
   background: #fff;
   transition: background-color .25s, border-color .25s, box-shadow .25s;
 }
-.route-stops b { color: #8792a7; font-size: 12px; font-weight: 700; transition: color .25s; }
+/* not-yet-reached stops: muted, but still 4.8 : 1 on the map background
+   (was #8792a7 = 3.0 : 1); reached stops turn navy and their dot fills */
+.route-stops b { color: var(--muted); font-size: 12px; font-weight: 700; transition: color .25s; }
 .route-stops small { color: var(--muted); font-size: 11px; opacity: 0; transition: opacity .25s; }
 
 .route-stops li.is-on .route-dot,

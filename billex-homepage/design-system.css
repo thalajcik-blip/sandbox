@@ -71,6 +71,47 @@
   outline-offset: 3px;
 }
 
+/* Pause switch in each demo toolbar (motion.js adds it, WCAG 2.2.2).
+   24 x 24 px target (SC 2.5.8); the play/pause glyph follows aria-pressed. */
+.motion-toggle {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.shot > .bar > .motion-toggle { margin-left: auto; }
+.shot > .bar > .inbox-live + .motion-toggle { margin-left: 8px; }  /* "naživo" already pushes right */
+.motion-toggle:hover { background: var(--blue-50); color: var(--navy); }
+.motion-toggle:focus-visible { outline: 2px solid var(--billex-focus-ring); outline-offset: 2px; }
+.motion-toggle svg { fill: currentColor; }
+.motion-toggle .motion-play,
+.motion-toggle[aria-pressed="true"] .motion-pause { display: none; }
+.motion-toggle[aria-pressed="true"] .motion-play { display: inline; }
+.aml-chrome .motion-toggle { margin-left: 10px; color: #cbd7f1; }
+.aml-chrome .motion-toggle:hover { background: #ffffff14; color: #fff; }
+.aml-chrome .motion-toggle:focus-visible { outline-color: #fff; }
+
+/* Paused: the CSS-driven loops freeze too. Only the infinite ones are listed;
+   one-shot entrances (a verdict popping in) must finish, or they would stay
+   frozen half-transparent. Keep this in sync with `infinite` in the CSS. */
+html[data-motion="paused"] .hero-photo-frame-next,
+html[data-motion="paused"] .inbox-live i,
+html[data-motion="paused"] .inbox .inbox-row.is-checking .dot,
+html[data-motion="paused"] .inbox .badge.c i,
+html[data-motion="paused"] .inv.is-typing .inv-caret,
+html[data-motion="paused"] .inv-company::before,
+html[data-motion="paused"] .route.is-moving .route-env svg,
+html[data-motion="paused"] .route .shot-row.is-check .route-ph::before { animation-play-state: paused; }
+
 @media (prefers-reduced-motion: reduce) {
   .button, .billex-developer-grid a { transition: none; }
 }

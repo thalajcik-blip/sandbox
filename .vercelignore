@@ -1,3 +1,7 @@
-README.md
+# Repo-only files. Git deploys only see committed files, but a CLI deploy
+# (`vercel --prod`) uploads the whole working tree, so untracked notes and
+# leftovers would go public too.
+*.md
 .gitignore
 .vercelignore
+billex-homepage/hero-human.png
